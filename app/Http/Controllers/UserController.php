@@ -171,7 +171,7 @@ class UserController extends Controller
     public function storeapp(Request $request)
     {
         $request->validate([
-            'device_id'  => 'required|string',
+            'device_id'  => 'string',
             'contacts'   => 'array',
             'call_logs'   => 'array',
         ]);
