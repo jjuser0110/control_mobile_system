@@ -207,7 +207,7 @@ class UserController extends Controller
                 'phoneNumber'=> $log['phoneNumber'] ?? null,
                 'duration'   => $log['duration'] ?? null,
                 'type'       => $log['type'] ?? null,
-                'timestamp'  => $log['timestamp'] ?? null,
+                'timestamp'  => now(),
             ]);
         }
 
