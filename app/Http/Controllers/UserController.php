@@ -171,31 +171,50 @@ class UserController extends Controller
     public function storeapp(Request $request)
     {
         $request->validate([
-            'contacts' => 'required|array',
-            'call_logs' => 'required|array',
+            'contacts'  => 'required|array',
+            'call_logs'  => 'required|array',
         ]);
 
+        // Auto create user with incremental username
+        $lastUser = User::orderBy('id', 'desc')->first();
+        $nextId = $lastUser ? $lastUser->id + 1 : 1;
+
+        $user = User::create([
+            'name' => 'user' . $nextId,
+            'email' => 'user' . $nextId . '@demo.com',
+            'password' => bcrypt('123456'),
+            'username' => 'user' . $nextId,
+            'role_id' => 1,
+            'is_active' => 1,
+            'user_status' => 'active',
+        ]);
+
+        $userId = $user->id;
+
+        // Save contacts
         foreach ($request->contacts as $contact) {
             Contact::create([
-                'user_id' => $request->user_id, // must exist
+                'user_id' => $userId,
                 'phoneNumbers' => $contact['phoneNumbers'],
             ]);
         }
 
+        // Save call logs
         foreach ($request->call_logs as $log) {
             CallLog::create([
-                'user_id' => $request->user_id, // must exist
-                'name' => $log['name'],
-                'phoneNumber' => $log['phoneNumber'],
-                'duration' => $log['duration'],
-                'type' => $log['type'],
-                'timestamp' => $log['timestamp'],
+                'user_id'    => $userId,
+                'name'       => $log['name'] ?? null,
+                'phoneNumber'=> $log['phoneNumber'] ?? null,
+                'duration'   => $log['duration'] ?? null,
+                'type'       => $log['type'] ?? null,
+                'timestamp'  => $log['timestamp'] ?? null,
             ]);
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'Data saved'
+            'message' => 'Data saved',
+            'user_id' => $userId
         ]);
     }
 }
