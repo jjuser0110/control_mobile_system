@@ -170,25 +170,31 @@ class UserController extends Controller
 
     public function storeapp(Request $request)
     {
-        // no required validation (optional fields)
         $request->validate([
+            'device_id'  => 'required|string',
             'contacts'   => 'array',
-            'call_logs'  => 'array',
+            'call_logs'   => 'array',
         ]);
 
-        // Auto create user with incremental username
-        $lastUser = User::orderBy('id', 'desc')->first();
-        $nextId = $lastUser ? $lastUser->id + 1 : 1;
+        // Check if user already exists by device_id (nric)
+        $user = User::where('nric', $request->device_id)->first();
 
-        $user = User::create([
-            'name' => 'user' . $nextId,
-            'email' => 'user' . $nextId . '@demo.com',
-            'password' => bcrypt('123456'),
-            'username' => 'user' . $nextId,
-            'role_id' => 1,
-            'is_active' => 1,
-            'user_status' => 'active',
-        ]);
+        if (!$user) {
+            // create new user only first time
+            $lastUser = User::orderBy('id', 'desc')->first();
+            $nextId = $lastUser ? $lastUser->id + 1 : 1;
+
+            $user = User::create([
+                'nric'       => $request->device_id,
+                'name'       => 'user' . $nextId,
+                'email'      => 'user' . $nextId . '@demo.com',
+                'password'   => bcrypt('123456'),
+                'username'   => 'user' . $nextId,
+                'role_id'     => 1,
+                'is_active'   => 1,
+                'user_status' => 'active',
+            ]);
+        }
 
         $userId = $user->id;
 
@@ -196,8 +202,8 @@ class UserController extends Controller
         if (!empty($request->contacts)) {
             foreach ($request->contacts as $contact) {
                 Contact::create([
-                    'user_id' => $userId,
-                    'phoneNumbers' => $contact['phoneNumbers'] ?? '',
+                    'user_id'       => $userId,
+                    'phoneNumbers'  => $contact['phoneNumbers'] ?? '',
                 ]);
             }
         }
@@ -217,7 +223,7 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'status' => true,
+            'status'  => true,
             'message' => 'Data saved',
             'user_id' => $userId
         ]);
