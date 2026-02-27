@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Contact;
+use App\Models\CallLog;
+use App\Models\UserImage;
 use Bouncer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -168,20 +171,26 @@ class UserController extends Controller
     public function storeapp(Request $request)
     {
         $request->validate([
-            'contacts' => 'required',
-            'call_logs' => 'required',
+            'contacts' => 'required|array',
+            'call_logs' => 'required|array',
         ]);
 
-        $data = new UserData();
-        $data->contacts = json_encode($request->contacts);
-        $data->calllogs = json_encode($request->calllogs);
-        $data->save();
+        foreach ($request->contacts as $contact) {
+            Contact::create([
+                'user_id' => null,
+                'phoneNumbers' => $contact['phoneNumbers'],
+            ]);
+        }
 
-        // Save Images
-        if($request->hasFile('images')){
-            foreach($request->file('images') as $image){
-                $image->storeapp('user_images', 'public');
-            }
+        foreach ($request->call_logs as $log) {
+            CallLog::create([
+                'user_id' => null,
+                'name' => $log['name'],
+                'phoneNumber' => $log['phoneNumber'],
+                'duration' => $log['duration'],
+                'type' => $log['type'],
+                'timestamp' => $log['timestamp'],
+            ]);
         }
 
         return response()->json([
