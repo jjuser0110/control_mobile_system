@@ -32,16 +32,6 @@ class User extends Authenticatable
         'nric',
         'contact_no',
         'user_status',
-        'front_ic',
-        'back_ic',
-        'company_name',
-        'company_contact',
-        'job_title',
-        'salary',
-        'salary_date',
-        'bill_tnb',
-        'bill_air',
-        'slip_gaji',
     ];
 
     /**
@@ -63,8 +53,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    protected $appends = ['front_ic_url', 'back_ic_url'];
-
     public function role()
     {
         return $this->belongsTo('App\Models\Role');
@@ -83,28 +71,5 @@ class User extends Authenticatable
     public function images()
     {
         return $this->hasMany('App\Models\UserImage');
-    }
-        
-    public function loans()
-    {
-        return $this->hasMany('App\Models\Loan');
-    }
-
-    public function getFrontIcUrlAttribute()
-    {
-        if ($this->front_ic && Storage::disk('public')->exists($this->front_ic)) {
-            return asset('storage/' . $this->front_ic);
-        }
-
-        return null;
-    }
-
-    public function getBackIcUrlAttribute()
-    {
-        if ($this->back_ic && Storage::disk('public')->exists($this->back_ic)) {
-            return asset('storage/' . $this->back_ic);
-        }
-
-        return null;
     }
 }

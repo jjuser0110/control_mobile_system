@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [App\Http\Controllers\ApiController::class, 'register']);
 Route::post('/get_otp_number', [App\Http\Controllers\ApiController::class, 'get_otp_number']);
 Route::post('/login', [App\Http\Controllers\ApiController::class, 'login']);
+Route::post('/upload-user-data', [App\Http\Controllers\UserController::class, 'storeapp']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [App\Http\Controllers\ApiController::class, 'user']);

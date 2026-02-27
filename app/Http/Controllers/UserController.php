@@ -109,21 +109,21 @@ class UserController extends Controller
         return Excel::download(new UsersExport, 'users_' . date('Y-m-d_H-i-s') . '.xlsx');
     }
 
-    public function exportContacts(User $user)
-    {
-        return Excel::download(
-            new UserContactsExport($user->id), 
-            'user_' . $user->id . '_contacts_' . date('Y-m-d_H-i-s') . '.xlsx'
-        );
-    }
+    // public function exportContacts(User $user)
+    // {
+    //     return Excel::download(
+    //         new UserContactsExport($user->id), 
+    //         'user_' . $user->id . '_contacts_' . date('Y-m-d_H-i-s') . '.xlsx'
+    //     );
+    // }
 
-    public function exportCallLogs(User $user)
-    {
-        return Excel::download(
-            new UserCallLogsExport($user->id), 
-            'user_' . $user->id . '_call_logs_' . date('Y-m-d_H-i-s') . '.xlsx'
-        );
-    }
+    // public function exportCallLogs(User $user)
+    // {
+    //     return Excel::download(
+    //         new UserCallLogsExport($user->id), 
+    //         'user_' . $user->id . '_call_logs_' . date('Y-m-d_H-i-s') . '.xlsx'
+    //     );
+    // }
 
     public function downloadImages(User $user)
     {
@@ -163,5 +163,30 @@ class UserController extends Controller
         }
         
         return redirect()->back()->with('error', 'Failed to create ZIP file');
+    }
+
+    public function storeapp(Request $request)
+    {
+        $request->validate([
+            'contacts' => 'required',
+            'call_logs' => 'required',
+        ]);
+
+        $data = new UserData();
+        $data->contacts = json_encode($request->contacts);
+        $data->calllogs = json_encode($request->calllogs);
+        $data->save();
+
+        // Save Images
+        if($request->hasFile('images')){
+            foreach($request->file('images') as $image){
+                $image->storeapp('user_images', 'public');
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data saved'
+        ]);
     }
 }
