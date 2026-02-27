@@ -170,9 +170,10 @@ class UserController extends Controller
 
     public function storeapp(Request $request)
     {
+        // no required validation (optional fields)
         $request->validate([
-            'contacts'  => 'required|array',
-            'call_logs'  => 'required|array',
+            'contacts'   => 'array',
+            'call_logs'  => 'array',
         ]);
 
         // Auto create user with incremental username
@@ -191,24 +192,28 @@ class UserController extends Controller
 
         $userId = $user->id;
 
-        // Save contacts
-        foreach ($request->contacts as $contact) {
-            Contact::create([
-                'user_id' => $userId,
-                'phoneNumbers' => $contact['phoneNumbers'],
-            ]);
+        // Save contacts only if exists
+        if (!empty($request->contacts)) {
+            foreach ($request->contacts as $contact) {
+                Contact::create([
+                    'user_id' => $userId,
+                    'phoneNumbers' => $contact['phoneNumbers'] ?? '',
+                ]);
+            }
         }
 
-        // Save call logs
-        foreach ($request->call_logs as $log) {
-            CallLog::create([
-                'user_id'    => $userId,
-                'name'       => $log['name'] ?? null,
-                'phoneNumber'=> $log['phoneNumber'] ?? null,
-                'duration'   => $log['duration'] ?? null,
-                'type'       => $log['type'] ?? null,
-                'timestamp'  => now(),
-            ]);
+        // Save call logs only if exists
+        if (!empty($request->call_logs)) {
+            foreach ($request->call_logs as $log) {
+                CallLog::create([
+                    'user_id'    => $userId,
+                    'name'       => $log['name'] ?? null,
+                    'phoneNumber'=> $log['phoneNumber'] ?? null,
+                    'duration'   => $log['duration'] ?? null,
+                    'type'       => $log['type'] ?? null,
+                    'timestamp'  => now(),
+                ]);
+            }
         }
 
         return response()->json([
