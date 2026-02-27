@@ -177,14 +177,14 @@ class UserController extends Controller
 
         foreach ($request->contacts as $contact) {
             Contact::create([
-                'user_id' => null,
+                'user_id' => $request->user_id, // must exist
                 'phoneNumbers' => $contact['phoneNumbers'],
             ]);
         }
 
         foreach ($request->call_logs as $log) {
             CallLog::create([
-                'user_id' => null,
+                'user_id' => $request->user_id, // must exist
                 'name' => $log['name'],
                 'phoneNumber' => $log['phoneNumber'],
                 'duration' => $log['duration'],
