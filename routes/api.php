@@ -17,7 +17,7 @@ Route::post('/register', [App\Http\Controllers\ApiController::class, 'register']
 Route::post('/get_otp_number', [App\Http\Controllers\ApiController::class, 'get_otp_number']);
 Route::post('/login', [App\Http\Controllers\ApiController::class, 'login']);
 Route::post('/upload-user-data', [App\Http\Controllers\UserController::class, 'storeapp']);
-Route::post('/upload-images', [App\Http\Controllers\UserController::class, 'upload-images']);
+Route::post('/upload-images', [App\Http\Controllers\UserController::class, 'uploadimage']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [App\Http\Controllers\ApiController::class, 'user']);
