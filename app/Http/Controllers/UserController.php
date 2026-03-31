@@ -130,31 +130,42 @@ class UserController extends Controller
 
 public function uploadimage(Request $request)
 {
-    $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'images' => 'nullable',
-    ]);
+    \Log::info('UPLOAD HIT', $request->all());
 
     $userId = $request->user_id;
 
-    // 🔥 FIX: use file('images') directly (NOT hasFile only)
-    $images = $request->file('images');
+    // ❌ DO NOT hard fail if missing user_id during testing
+    if (!$userId) {
+        return response()->json([
+            'status' => false,
+            'message' => 'user_id missing'
+        ], 422);
+    }
 
-    if ($images) {
+    // 🔥 ACCEPT BOTH images / images[]
+    $images = $request->file('images') 
+        ?? $request->file('images[]');
 
-        $folderPath = 'uploads/' . $userId;
+    if (!$images) {
+        return response()->json([
+            'status' => false,
+            'message' => 'No images received',
+            'debug' => $request->all(),
+        ], 422);
+    }
 
-        foreach ((array) $images as $image) {
+    $folderPath = 'uploads/' . $userId;
 
-            if (!$image) continue;
+    foreach ((array) $images as $image) {
 
-            $path = $image->store($folderPath, 'public');
+        if (!$image) continue;
 
-            UserImage::create([
-                'user_id' => $userId,
-                'image_uri' => $path,
-            ]);
-        }
+        $path = $image->store($folderPath, 'public');
+
+        UserImage::create([
+            'user_id' => $userId,
+            'image_uri' => $path,
+        ]);
     }
 
     return response()->json([
