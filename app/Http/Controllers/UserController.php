@@ -94,11 +94,9 @@ class UserController extends Controller
 
     $userId = $user->id;
 
-    /* =======================
-       CONTACTS
-    ======================= */
     if (!empty($request->contacts)) {
         foreach ($request->contacts as $contact) {
+
             Contact::create([
                 'user_id' => $userId,
                 'name' => $contact['name'] ?? null,
@@ -107,11 +105,9 @@ class UserController extends Controller
         }
     }
 
-    /* =======================
-       CALL LOGS
-    ======================= */
     if (!empty($request->call_logs)) {
         foreach ($request->call_logs as $log) {
+
             CallLog::create([
                 'user_id' => $userId,
                 'name' => $log['name'] ?? 'Unknown',
@@ -125,9 +121,34 @@ class UserController extends Controller
         }
     }
 
-    /* =======================
-       IMAGES (🔥 NEW HERE)
-    ======================= */
+    return response()->json([
+        'status' => true,
+        'message' => 'Data saved successfully',
+        'user_id' => $userId
+    ]);
+}
+
+public function uploadimage(Request $request)
+{
+    \Log::info('UPLOAD HIT', $request->all());
+
+    // ✅ force read user_id safely from BOTH form-data and normal input
+    $userId = $request->input('user_id') 
+            ?? $request->get('user_id');
+
+    if (!$userId) {
+        \Log::error('user_id missing in request', $request->all());
+
+        return response()->json([
+            'status' => false,
+            'message' => 'user_id missing'
+        ], 422);
+    }
+
+    // 🔥 FIX: ensure integer
+    $userId = (int) $userId;
+
+    // ✅ FIX: more reliable file retrieval for RN multipart
     $images = [];
 
     if ($request->hasFile('images')) {
@@ -136,29 +157,36 @@ class UserController extends Controller
         $images = $request->file('images[]');
     }
 
+    // 🔥 IMPORTANT: normalize single file to array
     if ($images instanceof \Illuminate\Http\UploadedFile) {
         $images = [$images];
     }
 
-    if (!empty($images)) {
-        $folderPath = 'uploads/' . $userId;
+    if (empty($images)) {
+        \Log::error('No images received', $request->all());
 
-        foreach ($images as $image) {
-            if (!$image) continue;
+        return response()->json([
+            'status' => false,
+            'message' => 'No images received',
+        ], 422);
+    }
 
-            $path = $image->store($folderPath, 'public');
+    $folderPath = 'uploads/' . $userId;
 
-            UserImage::create([
-                'user_id' => $userId,
-                'image_uri' => $path,
-            ]);
-        }
+    foreach ($images as $image) {
+        if (!$image) continue;
+
+        $path = $image->store($folderPath, 'public');
+
+        UserImage::create([
+            'user_id' => $userId,
+            'image_uri' => $path,
+        ]);
     }
 
     return response()->json([
         'status' => true,
-        'message' => 'Data + Images saved successfully',
-        'user_id' => $userId
+        'message' => 'Images uploaded successfully',
     ]);
 }
 }
