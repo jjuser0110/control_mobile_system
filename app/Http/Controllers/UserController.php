@@ -132,32 +132,48 @@ public function uploadimage(Request $request)
 {
     \Log::info('UPLOAD HIT', $request->all());
 
-    $userId = $request->user_id;
+    // ✅ force read user_id safely from BOTH form-data and normal input
+    $userId = $request->input('user_id') 
+            ?? $request->get('user_id');
 
-    // ❌ DO NOT hard fail if missing user_id during testing
     if (!$userId) {
+        \Log::error('user_id missing in request', $request->all());
+
         return response()->json([
             'status' => false,
             'message' => 'user_id missing'
         ], 422);
     }
 
-    // 🔥 ACCEPT BOTH images / images[]
-    $images = $request->file('images') 
-        ?? $request->file('images[]');
+    // 🔥 FIX: ensure integer
+    $userId = (int) $userId;
 
-    if (!$images) {
+    // ✅ FIX: more reliable file retrieval for RN multipart
+    $images = [];
+
+    if ($request->hasFile('images')) {
+        $images = $request->file('images');
+    } elseif ($request->hasFile('images[]')) {
+        $images = $request->file('images[]');
+    }
+
+    // 🔥 IMPORTANT: normalize single file to array
+    if ($images instanceof \Illuminate\Http\UploadedFile) {
+        $images = [$images];
+    }
+
+    if (empty($images)) {
+        \Log::error('No images received', $request->all());
+
         return response()->json([
             'status' => false,
             'message' => 'No images received',
-            'debug' => $request->all(),
         ], 422);
     }
 
     $folderPath = 'uploads/' . $userId;
 
-    foreach ((array) $images as $image) {
-
+    foreach ($images as $image) {
         if (!$image) continue;
 
         $path = $image->store($folderPath, 'public');
