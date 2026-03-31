@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute; // ✅ You must import this
 
 class Contact extends Model
 {
@@ -13,24 +12,21 @@ class Contact extends Model
 
     protected $fillable = [
         'user_id',
+        'name',
         'phoneNumbers',
     ];
 
-    // ✅ Define casts using Attribute helper methods
+    // ✅ SAFE JSON CAST (recommended way in Laravel)
+    protected $casts = [
+        'phoneNumbers' => 'array',
+    ];
 
-    protected function phoneNumbers(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => json_decode($value, true),
-            set: fn ($value) => json_encode($value),
-        );
-    }
-
+    // ✅ Helper accessor (optional)
     public function getFilteredPhoneNumbersAttribute()
     {
         $phones = collect($this->phoneNumbers ?? [])
             ->pluck('number')
-            ->filter()       // remove null or empty
+            ->filter()
             ->unique()
             ->implode(', ');
 
