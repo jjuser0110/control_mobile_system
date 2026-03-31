@@ -24,7 +24,6 @@
                         <th>NRIC</th>
                         <th>Contact No</th>
                         <th>Status</th>
-                        <th>Verify</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -48,36 +47,12 @@
                                 @endif
                             </td>
 
-                            {{-- Verify Status --}}
-                            <td>{{ $row->user_status }}</td>
-
                             {{-- Actions --}}
                             <td>
-
-                                {{-- VERIFY / UNVERIFY --}}
-                                @if($row->user_status != "verified")
-                                    <a href="{{ route('user.verify', $row->id) }}"
-                                       onclick="return confirm('Verify this user?')">
-                                        Verify
-                                    </a>
-                                @else
-                                    <a style="color:red"
-                                       href="{{ route('user.unverify', $row->id) }}"
-                                       onclick="return confirm('Unverify this user?')">
-                                        Not Verify
-                                    </a>
-                                @endif
-
                                 {{-- VIEW --}}
                                 <a href="{{ route('user.view', $row->id) }}" onclick="showLoading()">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-
-                                {{-- EDIT --}}
-                                <a href="{{ route('user.edit', $row->id) }}" onclick="showLoading()">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </a>
-
                                 {{-- DELETE --}}
                                 <a style="color:red"
                                    href="{{ route('user.destroy', $row->id) }}"
