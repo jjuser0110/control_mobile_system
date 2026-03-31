@@ -65,7 +65,7 @@ class User extends Authenticatable
 
     public function callLogs()
     {
-        return $this->hasMany(Calllog::class);
+        return $this->hasMany(CallLog::class);
     }
 
     public function images()
