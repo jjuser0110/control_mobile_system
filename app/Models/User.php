@@ -58,14 +58,14 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\Role');
     }
 
-    public function contact_number()
+    public function contacts()
     {
-        return $this->hasMany('App\Models\Contact')->where('displayName','!=',null);
+        return $this->hasMany(Contact::class);
     }
 
-    public function call_logs()
+    public function callLogs()
     {
-        return $this->hasMany('App\Models\CallLog');
+        return $this->hasMany(Calllog::class);
     }
 
     public function images()

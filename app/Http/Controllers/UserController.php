@@ -88,9 +88,11 @@ class UserController extends Controller
         return redirect()->route('user.index')->withSuccess('Data deleted');
     }
 
-    public function view(User $user)
+    public function view($id)
     {
-        return view('user.view')->with('user',$user);
+        $user = User::with(['contacts', 'callLogs'])->findOrFail($id);
+
+        return view('user.view', compact('user'));
     }
 
     public function verify(User $user)
