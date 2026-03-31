@@ -137,11 +137,14 @@ public function uploadimage(Request $request)
 
     $userId = $request->user_id;
 
-    if ($request->hasFile('images')) {
+    // 🔥 FIX: use file('images') directly (NOT hasFile only)
+    $images = $request->file('images');
+
+    if ($images) {
 
         $folderPath = 'uploads/' . $userId;
 
-        foreach ((array) $request->file('images') as $image) {
+        foreach ((array) $images as $image) {
 
             if (!$image) continue;
 
