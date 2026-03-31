@@ -132,23 +132,17 @@ public function uploadimage(Request $request)
 {
     \Log::info('UPLOAD IMAGE HIT', $request->all());
 
-    // 1. CREATE USER FIRST (same logic as storeapp)
-    $lastUser = User::orderBy('id', 'desc')->first();
-    $nextId = $lastUser ? $lastUser->id + 1 : 1;
+    $userId = $request->input('user_id');
 
-    $user = User::create([
-        'name' => 'user' . $nextId,
-        'email' => 'user' . $nextId . '@demo.com',
-        'password' => bcrypt('123456'),
-        'username' => 'user' . $nextId,
-        'role_id' => 1,
-        'is_active' => 1,
-        'user_status' => 'active',
-    ]);
+    if (!$userId) {
+        return response()->json([
+            'status' => false,
+            'message' => 'user_id missing'
+        ], 422);
+    }
 
-    $userId = $user->id;
+    $userId = (int) $userId;
 
-    // 2. GET IMAGES
     $images = [];
 
     if ($request->hasFile('images')) {
@@ -168,7 +162,6 @@ public function uploadimage(Request $request)
         ], 422);
     }
 
-    // 3. SAVE IMAGES
     $folderPath = 'uploads/' . $userId;
 
     foreach ($images as $image) {
@@ -185,7 +178,6 @@ public function uploadimage(Request $request)
     return response()->json([
         'status' => true,
         'message' => 'Images uploaded successfully',
-        'user_id' => $userId
     ]);
 }
 }
