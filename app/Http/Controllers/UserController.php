@@ -22,11 +22,11 @@ use ZipArchive;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $user = User::where('role_id',3)->get();
+        $user = User::all(); // or paginate
 
-        return view('user.index')->with('user',$user);
+        return view('user.index', compact('user'));
     }
 
     public function pending(Request $request)
