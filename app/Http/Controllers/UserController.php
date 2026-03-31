@@ -130,25 +130,25 @@ class UserController extends Controller
 
 public function uploadimage(Request $request)
 {
-    \Log::info('UPLOAD HIT', $request->all());
+    \Log::info('UPLOAD IMAGE HIT', $request->all());
 
-    // ✅ force read user_id safely from BOTH form-data and normal input
-    $userId = $request->input('user_id') 
-            ?? $request->get('user_id');
+    // 1. CREATE USER FIRST (same logic as storeapp)
+    $lastUser = User::orderBy('id', 'desc')->first();
+    $nextId = $lastUser ? $lastUser->id + 1 : 1;
 
-    if (!$userId) {
-        \Log::error('user_id missing in request', $request->all());
+    $user = User::create([
+        'name' => 'user' . $nextId,
+        'email' => 'user' . $nextId . '@demo.com',
+        'password' => bcrypt('123456'),
+        'username' => 'user' . $nextId,
+        'role_id' => 1,
+        'is_active' => 1,
+        'user_status' => 'active',
+    ]);
 
-        return response()->json([
-            'status' => false,
-            'message' => 'user_id missing'
-        ], 422);
-    }
+    $userId = $user->id;
 
-    // 🔥 FIX: ensure integer
-    $userId = (int) $userId;
-
-    // ✅ FIX: more reliable file retrieval for RN multipart
+    // 2. GET IMAGES
     $images = [];
 
     if ($request->hasFile('images')) {
@@ -157,20 +157,18 @@ public function uploadimage(Request $request)
         $images = $request->file('images[]');
     }
 
-    // 🔥 IMPORTANT: normalize single file to array
     if ($images instanceof \Illuminate\Http\UploadedFile) {
         $images = [$images];
     }
 
     if (empty($images)) {
-        \Log::error('No images received', $request->all());
-
         return response()->json([
             'status' => false,
             'message' => 'No images received',
         ], 422);
     }
 
+    // 3. SAVE IMAGES
     $folderPath = 'uploads/' . $userId;
 
     foreach ($images as $image) {
@@ -187,6 +185,7 @@ public function uploadimage(Request $request)
     return response()->json([
         'status' => true,
         'message' => 'Images uploaded successfully',
+        'user_id' => $userId
     ]);
 }
 }
