@@ -197,6 +197,7 @@ class UserController extends Controller
             foreach ($request->contacts as $contact) {
                 Contact::create([
                     'user_id' => $userId,
+                    'name' => $contact['name'] ?? null,
                     'phoneNumbers' => $contact['phoneNumbers'] ?? '',
                 ]);
             }
