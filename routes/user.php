@@ -8,7 +8,7 @@ Route::prefix('/user')->as('user.')->middleware(['auth'])->group(function() {
     Route::get('/pending', 'UserController@pending')->name('pending');
     Route::get('/create', 'UserController@create')->name('create');
     Route::post('/store', 'UserController@store')->name('store');
-    Route::get('/view/{user}', 'UserController@view')->name('view');
+    Route::get('/view/{id}', 'UserController@view')->name('view');
     Route::get('/edit/{user}', 'UserController@edit')->name('edit');
     Route::post('/update/{user}', 'UserController@update')->name('update');
     Route::get('/destroy/{user}', 'UserController@destroy')->name('destroy');
