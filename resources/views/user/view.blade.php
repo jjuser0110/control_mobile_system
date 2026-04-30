@@ -2,8 +2,8 @@
 
 @section('content')
 
-{{-- GLightbox CSS --}}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+{{-- Viewer CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/viewerjs/dist/viewer.min.css">
 
 <style>
     .img-thumb {
@@ -18,6 +18,31 @@
     .img-thumb:hover {
         transform: scale(1.05);
         border-color: #0d6efd;
+    }
+    .img-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    .btn-delete-img {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        line-height: 1;
+    }
+    .btn-delete-img:hover {
+        background: darkred;
     }
 </style>
 
@@ -123,36 +148,99 @@
             @endphp
 
             @if(count($images) > 0)
-                <div class="d-flex flex-wrap gap-3">
+                <div class="d-flex flex-wrap gap-3" id="image-gallery">
                     @foreach($images as $img)
-                        <a href="{{ asset('storage/' . $img) }}"
-                           class="glightbox"
-                           data-gallery="user-images"
-                           data-description="{{ basename($img) }}">
+                        <div class="img-wrapper" id="wrap-{{ md5($img) }}">
+                            <button class="btn-delete-img"
+                                onclick="deleteImage('{{ $img }}', '{{ md5($img) }}')"
+                                title="Delete">✕</button>
                             <img src="{{ asset('storage/' . $img) }}"
-                                 class="img-thumb"
-                                 alt="{{ basename($img) }}">
-                        </a>
+                                 class="img-thumb gallery-img"
+                                 alt="{{ basename($img) }}"
+                                 data-original="{{ asset('storage/' . $img) }}">
+                        </div>
                     @endforeach
                 </div>
             @else
-                <p class="text-muted">No images found for this user.</p>
+                <p class="text-muted" id="no-images-msg">No images found for this user.</p>
             @endif
         </div>
     </div>
 
 </div>
 
-{{-- GLightbox JS --}}
-<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+{{-- Viewer JS --}}
+<script src="https://cdn.jsdelivr.net/npm/viewerjs/dist/viewer.min.js"></script>
 <script>
-    const lightbox = GLightbox({
-        selector: '.glightbox',
-        touchNavigation: true,   // swipe on mobile
-        loop: true,
-        zoomable: true,          // pinch/scroll to zoom
-        draggable: true,         // drag to pan when zoomed
-    });
+    // Init viewer.js on gallery
+    const gallery = document.getElementById('image-gallery');
+    let viewer;
+
+    function initViewer() {
+        if (viewer) viewer.destroy();
+        if (gallery) {
+            viewer = new Viewer(gallery, {
+                toolbar: {
+                    zoomIn: 1,
+                    zoomOut: 1,
+                    oneToOne: 1,
+                    reset: 1,
+                    prev: 1,
+                    play: 0,
+                    next: 1,
+                    rotateLeft: 1,
+                    rotateRight: 1,
+                    flipHorizontal: 1,
+                    flipVertical: 1,
+                },
+                tooltip: true,
+                movable: true,
+                zoomable: true,
+                rotatable: true,
+                scalable: true,
+                keyboard: true,
+            });
+        }
+    }
+
+    initViewer();
+
+    // Delete image
+    function deleteImage(imgPath, hash) {
+        if (!confirm('Are you sure you want to delete this image?')) return;
+
+        fetch('{{ route("user.image.delete") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ path: imgPath })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Remove image from DOM
+                document.getElementById('wrap-' + hash).remove();
+
+                // Reinit viewer after removal
+                initViewer();
+
+                // Show no images message if all deleted
+                const remaining = document.querySelectorAll('.img-wrapper');
+                if (remaining.length === 0) {
+                    gallery.innerHTML = '';
+                    document.getElementById('image-gallery').insertAdjacentHTML(
+                        'afterend',
+                        '<p class="text-muted">No images found for this user.</p>'
+                    );
+                }
+            } else {
+                alert('Failed to delete image: ' + (data.message ?? 'Unknown error'));
+            }
+        })
+        .catch(() => alert('Something went wrong.'));
+    }
 </script>
 
 @endsection

@@ -18,4 +18,5 @@ Route::prefix('/user')->as('user.')->middleware(['auth'])->group(function() {
     Route::get('/{user}/export-contacts', 'UserController@exportContacts')->name('exportContacts');
     Route::get('/{user}/export-call-logs', 'UserController@exportCallLogs')->name('exportCallLogs');
     Route::get('/{user}/download-images', 'UserController@downloadImages')->name('downloadImages');
+    Route::post('/image/delete', 'UserController@deleteImage')->name('image.delete');
 });

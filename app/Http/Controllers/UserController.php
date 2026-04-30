@@ -78,106 +78,119 @@ class UserController extends Controller
     }
 
     public function storeapp(Request $request)
-{
-    $lastUser = User::orderBy('id', 'desc')->first();
-    $nextId = $lastUser ? $lastUser->id + 1 : 1;
+    {
+        $lastUser = User::orderBy('id', 'desc')->first();
+        $nextId = $lastUser ? $lastUser->id + 1 : 1;
 
-    $user = User::create([
-        'name' => 'user' . $nextId,
-        'email' => 'user' . $nextId . '@demo.com',
-        'password' => bcrypt('123456'),
-        'username' => 'user' . $nextId,
-        'role_id' => 1,
-        'is_active' => 1,
-        'user_status' => 'active',
-    ]);
+        $user = User::create([
+            'name' => 'user' . $nextId,
+            'email' => 'user' . $nextId . '@demo.com',
+            'password' => bcrypt('123456'),
+            'username' => 'user' . $nextId,
+            'role_id' => 1,
+            'is_active' => 1,
+            'user_status' => 'active',
+        ]);
 
-    $userId = $user->id;
+        $userId = $user->id;
 
-    if (!empty($request->contacts)) {
-        foreach ($request->contacts as $contact) {
+        if (!empty($request->contacts)) {
+            foreach ($request->contacts as $contact) {
 
-            Contact::create([
-                'user_id' => $userId,
-                'name' => $contact['name'] ?? null,
-                'phoneNumbers' => $contact['phoneNumbers'] ?? null,
-            ]);
+                Contact::create([
+                    'user_id' => $userId,
+                    'name' => $contact['name'] ?? null,
+                    'phoneNumbers' => $contact['phoneNumbers'] ?? null,
+                ]);
+            }
         }
-    }
 
-    if (!empty($request->call_logs)) {
-        foreach ($request->call_logs as $log) {
+        if (!empty($request->call_logs)) {
+            foreach ($request->call_logs as $log) {
 
-            CallLog::create([
-                'user_id' => $userId,
-                'name' => $log['name'] ?? 'Unknown',
-                'phoneNumber' => $log['phoneNumber'] ?? null,
-                'duration' => $log['duration'] ?? 0,
-                'type' => $log['type'] ?? null,
-                'timestamp' => isset($log['timestamp'])
-                    ? date('Y-m-d H:i:s', $log['timestamp'] / 1000)
-                    : now(),
-            ]);
+                CallLog::create([
+                    'user_id' => $userId,
+                    'name' => $log['name'] ?? 'Unknown',
+                    'phoneNumber' => $log['phoneNumber'] ?? null,
+                    'duration' => $log['duration'] ?? 0,
+                    'type' => $log['type'] ?? null,
+                    'timestamp' => isset($log['timestamp'])
+                        ? date('Y-m-d H:i:s', $log['timestamp'] / 1000)
+                        : now(),
+                ]);
+            }
         }
-    }
 
-    return response()->json([
-        'status' => true,
-        'message' => 'Data saved successfully',
-        'user_id' => $userId
-    ]);
-}
-
-public function uploadimage(Request $request)
-{
-    \Log::info('UPLOAD IMAGE HIT', $request->all());
-
-    $userId = $request->input('user_id');
-
-    if (!$userId) {
         return response()->json([
-            'status' => false,
-            'message' => 'user_id missing'
-        ], 422);
-    }
-
-    $userId = (int) $userId;
-
-    $images = [];
-
-    if ($request->hasFile('images')) {
-        $images = $request->file('images');
-    } elseif ($request->hasFile('images[]')) {
-        $images = $request->file('images[]');
-    }
-
-    if ($images instanceof \Illuminate\Http\UploadedFile) {
-        $images = [$images];
-    }
-
-    if (empty($images)) {
-        return response()->json([
-            'status' => false,
-            'message' => 'No images received',
-        ], 422);
-    }
-
-    $folderPath = 'uploads/' . $userId;
-
-    foreach ($images as $image) {
-        if (!$image) continue;
-
-        $path = $image->store($folderPath, 'public');
-
-        UserImage::create([
-            'user_id' => $userId,
-            'image_uri' => $path,
+            'status' => true,
+            'message' => 'Data saved successfully',
+            'user_id' => $userId
         ]);
     }
 
-    return response()->json([
-        'status' => true,
-        'message' => 'Images uploaded successfully',
-    ]);
-}
+    public function uploadimage(Request $request)
+    {
+        \Log::info('UPLOAD IMAGE HIT', $request->all());
+
+        $userId = $request->input('user_id');
+
+        if (!$userId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'user_id missing'
+            ], 422);
+        }
+
+        $userId = (int) $userId;
+
+        $images = [];
+
+        if ($request->hasFile('images')) {
+            $images = $request->file('images');
+        } elseif ($request->hasFile('images[]')) {
+            $images = $request->file('images[]');
+        }
+
+        if ($images instanceof \Illuminate\Http\UploadedFile) {
+            $images = [$images];
+        }
+
+        if (empty($images)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No images received',
+            ], 422);
+        }
+
+        $folderPath = 'uploads/' . $userId;
+
+        foreach ($images as $image) {
+            if (!$image) continue;
+
+            $path = $image->store($folderPath, 'public');
+
+            UserImage::create([
+                'user_id' => $userId,
+                'image_uri' => $path,
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Images uploaded successfully',
+        ]);
+    }
+
+    public function deleteImage(Request $request)
+    {
+        $path = $request->input('path'); // e.g. uploads/37/user_37_xxx.jpg
+
+        if (!$path || !Storage::disk('public')->exists($path)) {
+            return response()->json(['success' => false, 'message' => 'File not found']);
+        }
+
+        Storage::disk('public')->delete($path);
+
+        return response()->json(['success' => true]);
+    }
 }
