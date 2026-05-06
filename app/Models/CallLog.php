@@ -14,4 +14,9 @@ class CallLog extends Model
     protected $fillable = [
         'user_id', 'name', 'phoneNumber', 'duration', 'type', 'timestamp',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

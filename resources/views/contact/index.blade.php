@@ -5,12 +5,12 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     <h4 class="py-3 breadcrumb-wrapper mb-4">
-        <span class="text-muted fw-light">User /</span> List
+        <span class="text-muted fw-light">Contact /</span> List
     </h4>
 
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0">User List</h5>
+            <h5 class="mb-0">Contact List</h5>
         </div>
 
         <div class="card-datatable text-nowrap">
@@ -18,34 +18,22 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Username</th>
-                        <th>NRIC</th>
-                        <th>Contact No</th>
-                        <th>Status</th>
+                        <th>User Name</th>
+                        <th>Contact Name</th>
+                        <th>Contact Number</th>
+                        <th>Created Time</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @foreach($user as $row)
+                    @foreach($contact as $row)
                         <tr>
                             <td>{{ $row->id }}</td>
+                            <td>{{ $row->user->name }}</td>
                             <td>{{ $row->name }}</td>
-                            <td>{{ $row->email }}</td>
-                            <td>{{ $row->username }}</td>
-                            <td>{{ $row->nric }}</td>
-                            <td>{{ $row->contact_no }}</td>
-
-                            {{-- Active / Inactive --}}
-                            <td>
-                                @if($row->is_active == 1)
-                                    <span style="color:green;">Active</span>
-                                @else
-                                    <span style="color:red;">Inactive</span>
-                                @endif
-                            </td>
+                            <td>{{ $row->phoneNumbers }}</td>
+                            <td>{{ $row->created_at }}</td>
 
                             {{-- Actions --}}
                             <td>
@@ -53,13 +41,10 @@
                                 <a href="{{ route('user.view', $row->id) }}" onclick="showLoading()">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-                                <a href="{{ route('user.app', $row->id) }}" onclick="showLoading()">
-                                    <i class="fa-solid fa-mobile-screen-button"></i>
-                                </a>
                                 {{-- DELETE --}}
                                 <a style="color:red"
-                                   href="{{ route('user.destroy', $row->id) }}"
-                                   onclick="return confirm('Delete this user?')">
+                                   href="{{ route('contact.destroy', $row->id) }}"
+                                   onclick="return confirm('Delete this contact?')">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
 

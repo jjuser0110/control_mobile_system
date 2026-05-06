@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Contact;
 use App\Models\CallLog;
 use App\Models\UserImage;
+use App\Models\App;
+use App\Models\AppIcon;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
@@ -29,6 +31,43 @@ class UserController extends Controller
     {
         $user = User::with(['contacts', 'callLogs', 'images'])->findOrFail($id);
         return view('user.view', compact('user'));
+    }
+
+    public function app($id)
+    {
+        $user = User::with(['contacts', 'callLogs', 'images'])->findOrFail($id);
+
+        $apps = App::with(['appIcon'])
+            ->where('user_id', $id)
+            ->orderBy('last_seen_at', 'desc')
+            ->get();
+
+        return view('user.app', compact('user', 'apps'));
+    }
+
+    public function uploadIcon(Request $request)
+    {
+        $request->validate([
+            'package_name' => 'required|string',
+            'app_icon'     => 'required|image|max:2048',
+        ]);
+
+        $existing = AppIcon::where('package_name', $request->package_name)->first();
+        if ($existing && $existing->app_icon_url) {
+            Storage::disk('public')->delete($existing->app_icon_url);
+        }
+
+        $path = $request->file('app_icon')->store('uploads/app_icons', 'public');
+
+        $icon = AppIcon::updateOrCreate(
+            ['package_name' => $request->package_name],  // find by this
+            ['app_icon_url' => $path]                     // update this
+        );
+
+        \App\Models\App::where('package_name', $request->package_name)
+            ->update(['app_icon_id' => $icon->id]);
+
+        return back()->withSuccess('App icon updated successfully');
     }
 
     public function downloadImages(User $user)

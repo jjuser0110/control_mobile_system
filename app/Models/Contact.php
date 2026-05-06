@@ -32,4 +32,9 @@ class Contact extends Model
 
         return $phones ?: null;
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

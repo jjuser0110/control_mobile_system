@@ -37,6 +37,35 @@ $currentRoute = request()->route()->getName();
                 <div>User</div>
             </a>
         </li>
+
+        <li class="menu-item {{ Str::contains($currentRoute, 'contact.index') ? 'active' : '' }}">
+            <a href="{{ route('contact.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-voice"></i>
+                <div>Contact List</div>
+            </a>
+        </li>
+
+        <li class="menu-item {{ Str::contains($currentRoute, 'call_log.index') ? 'active' : '' }}">
+            <a href="{{ route('call_log.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-phone-call"></i>
+                <div>Call Log List</div>
+            </a>
+        </li>
+
+         <li class="menu-item {{ Str::contains($currentRoute, 'device.index') ? 'active' : '' }}">
+            <a href="{{ route('device.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-devices"></i>
+                <div>Device</div>
+            </a>
+        </li>
+
+        <li class="menu-item {{ Str::contains($currentRoute, 'remote.index') ? 'active' : '' }}">
+            <a href="{{ route('remote.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-network-chart"></i>
+                <div>Remote Session</div>
+            </a>
+        </li>
+
     </ul>
 </aside>
 <!-- end: sidebar -->
