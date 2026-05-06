@@ -51,16 +51,16 @@
                             <td>
                                 {{-- VIEW --}}
                                 <a href="{{ route('user.view', $row->id) }}" onclick="showLoading()">
-                                    <i class="fa-solid fa-eye"></i>
+                                    <i class="fa-solid fa-eye me-2"></i>
                                 </a>
                                 <a href="{{ route('user.app', $row->id) }}" onclick="showLoading()">
-                                    <i class="fa-solid fa-mobile-screen-button"></i>
+                                    <i class="fa-solid fa-mobile-screen-button me-2"></i>
                                 </a>
                                 {{-- DELETE --}}
                                 <a style="color:red"
                                    href="{{ route('user.destroy', $row->id) }}"
                                    onclick="return confirm('Delete this user?')">
-                                    <i class="fa-solid fa-trash"></i>
+                                    <i class="fa-solid fa-trash me-2"></i>
                                 </a>
 
                             </td>
