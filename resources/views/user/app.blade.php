@@ -44,9 +44,9 @@
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="fa-solid fa-filter me-1"></i> Filter
                     </button>
-                    <a href="{{ route('user.app', $user->id) }}" class="btn btn-sm btn-outline-secondary">
+                    <!-- <a href="{{ route('user.app', $user->id) }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fa-solid fa-rotate-left me-1"></i> Reset
-                    </a>
+                    </a> -->
                 </div>
 
             </form>
