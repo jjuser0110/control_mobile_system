@@ -25,6 +25,8 @@
 <script src="{{ asset('assets/js/main.js') }}"></script>
 <script src="{{ asset('assets/js/ui-modals.js') }}"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <!-- Page JS -->
 <!-- <script src="{{ asset('assets/js/dashboards-analytics.js') }}"></script> -->
 <!-- <script src="{{ asset('assets/js/tables-datatables-basic.js') }}"></script> -->

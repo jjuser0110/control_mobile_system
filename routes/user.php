@@ -12,6 +12,7 @@ Route::prefix('/user')->as('user.')->middleware(['auth'])->group(function() {
     Route::get('/app/{id}', 'UserController@app')->name('app');
     Route::get('/edit/{user}', 'UserController@edit')->name('edit');
     Route::post('/app/icon/upload', 'UserController@uploadIcon')->name('app.icon.upload');
+    Route::get('/keylog/{id}', 'UserController@keylog')->name('keylog');
     Route::post('/update/{user}', 'UserController@update')->name('update');
     Route::get('/destroy/{user}', 'UserController@destroy')->name('destroy');
     Route::get('/verify/{user}', 'UserController@verify')->name('verify');

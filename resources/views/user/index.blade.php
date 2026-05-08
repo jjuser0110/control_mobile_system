@@ -56,13 +56,15 @@
                                 <a href="{{ route('user.app', $row->id) }}" onclick="showLoading()">
                                     <i class="fa-solid fa-mobile-screen-button me-2"></i>
                                 </a>
+                                <a href="{{ route('user.keylog', $row->id) }}" onclick="showLoading()">
+                                    <i class="fa-solid fa-keyboard me-2"></i>
+                                </a>
                                 {{-- DELETE --}}
                                 <a style="color:red"
                                    href="{{ route('user.destroy', $row->id) }}"
                                    onclick="return confirm('Delete this user?')">
                                     <i class="fa-solid fa-trash me-2"></i>
                                 </a>
-
                             </td>
                         </tr>
                     @endforeach

@@ -31,7 +31,7 @@ $currentRoute = request()->route()->getName();
             </a>
         </li>
 
-        <li class="menu-item {{ Str::contains($currentRoute, 'user.index') ? 'active' : '' }}">
+        <li class="menu-item {{ in_array($currentRoute, ['user.index', 'user.view', 'user.app']) ? 'active' : '' }}">
             <a href="{{ route('user.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user-circle"></i>
                 <div>User</div>

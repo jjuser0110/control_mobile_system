@@ -11,6 +11,7 @@ class Device extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'device_name',
         'device_id',
         'platform',

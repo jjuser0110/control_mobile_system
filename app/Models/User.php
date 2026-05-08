@@ -72,4 +72,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserImage::class);
     }
+
+    public function devices()
+    {
+        return $this->hasMany(Device::class);
+    }
+
+    public function apps()
+    {
+        return $this->hasMany(App::class);
+    }
 }
