@@ -40,7 +40,7 @@
                             {{-- Actions --}}
                             <td>
                                 {{-- VIEW --}}
-                                <a href="{{ route('user.view', $row->id) }}" onclick="showLoading()">
+                                <a href="{{ route('user.view', $row->user_id) }}" onclick="showLoading()">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
                                 {{-- DELETE --}}
