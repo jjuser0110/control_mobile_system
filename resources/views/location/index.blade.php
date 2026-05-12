@@ -48,7 +48,7 @@ $locations = [
 ];
 
 $stats = [
-    (object)['label' => 'Total Devices Tracked', 'value' => '24', 'icon' => 'fa-mobile-screen', 'color' => 'primary'],
+    (object)['label' => 'Total Devices Tracked', 'value' => '5', 'icon' => 'fa-mobile-screen', 'color' => 'primary'],
     (object)['label' => 'Active Now',             'value' => '8',  'icon' => 'fa-location-dot',  'color' => 'success'],
     (object)['label' => 'Last Hour Updates',      'value' => '61', 'icon' => 'fa-clock',          'color' => 'info'],
     (object)['label' => 'Offline Devices',        'value' => '3',  'icon' => 'fa-circle-xmark',   'color' => 'danger'],
