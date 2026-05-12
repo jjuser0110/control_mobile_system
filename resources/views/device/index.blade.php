@@ -48,9 +48,9 @@
                         <td>{{ $row->last_seen ?? '-' }}</td>
 
                         <td>
-                            <!-- <a href="{{ route('device.app', $row->id) }}" onclick="showLoading()">
-                                <i class="fa-solid fa-mobile-screen-button"></i>
-                            </a> -->
+                            <a href="{{ route('user.app', $row->user_id) }}" onclick="showLoading()">
+                                <i class="fa-solid fa-eye me-2"></i>
+                            </a>
                             <a href="{{ route('device.destroy', $row->id) }}"
                                style="color:red;"
                                onclick="return confirm('Delete this device?')">
